@@ -28,12 +28,12 @@ from datasets import load_dataset
 import os
 
 # Output directory for saving the raw dataset
-output_dir = "/tmp/hf-dataset/wikitext-103-raw-v1"
+output_dir = "/tmp/hf-dataset/openwebtext"
 os.makedirs(output_dir, exist_ok=True)
 
 # Load and save the raw dataset
-print("Downloading wikitext-103-raw-v1 from Hugging Face...")
-ds = load_dataset("wikitext", "wikitext-103-raw-v1")
+print("Downloading openwebtext from Hugging Face...")
+ds = load_dataset("openwebtext")
 ds.save_to_disk(output_dir)
 
 print(f"Dataset saved to: {output_dir}")
@@ -65,7 +65,7 @@ aws --endpoint-url $ENDPOINT s3 cp --recursive "$LOCAL_DIR" "s3://$BUCKET_NAME/$
 
 2. Upload to DigitalOcean Spaces:
    ```bash
-   ./scripts/upload-to-spaces.sh /tmp/hf-dataset/wikitext-103-raw-v1 your-bucket-name datasets/wikitext
+   ./scripts/upload-to-spaces.sh /tmp/hf-dataset/openwebtext your-bucket-name datasets/openwebtext
    ```
 
 ## 📁 Project Structure
