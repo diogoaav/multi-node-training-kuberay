@@ -18,6 +18,32 @@ This project scaffolds a distributed LLM training environment using:
   export AWS_SECRET_ACCESS_KEY=your_secret
   ```
 
+
+## ⚙️ Provision CPU-Only Kubernetes Cluster for Tokenization
+
+First, create a Kubernetes cluster with a **CPU-optimized node pool** in the Atlanta region using `doctl`:
+
+```bash
+doctl kubernetes cluster create llm-training-cpu \
+  --region atl1 \
+  --count 3 \
+  --size c-8 \
+  --tag-name tokenizer \
+  --auto-upgrade=false
+```
+
+This will:
+- Create a new cluster named `llm-training-cpu`
+- Use 3× `c-8` nodes (8 vCPU, 16GB RAM)
+- Deploy to the `atl1` region
+- Tag nodes with `tokenizer`
+
+After creation, authenticate:
+
+```bash
+doctl kubernetes cluster kubeconfig save llm-training-cpu
+```
+
 ## 📦 Dataset Preparation & Upload
 
 ### Dataset Loader Script
