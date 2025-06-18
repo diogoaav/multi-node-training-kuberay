@@ -19,31 +19,6 @@ This project scaffolds a distributed LLM training environment using:
   ```
 
 
-## ⚙️ Provision CPU-Only Kubernetes Cluster for Tokenization
-
-First, create a Kubernetes cluster with a **CPU-optimized node pool** in the Atlanta region using `doctl`:
-
-```bash
-doctl kubernetes cluster create llm-training-cpu \
-  --region atl1 \
-  --count 3 \
-  --size c-8 \
-  --tag-name tokenizer \
-  --auto-upgrade=false
-```
-
-This will:
-- Create a new cluster named `llm-training-cpu`
-- Use 3× `c-8` nodes (8 vCPU, 16GB RAM)
-- Deploy to the `atl1` region
-- Tag nodes with `tokenizer`
-
-After creation, authenticate:
-
-```bash
-doctl kubernetes cluster kubeconfig save llm-training-cpu
-```
-
 ## 📦 Dataset Preparation & Upload
 
 ### Dataset Loader Script
@@ -93,6 +68,41 @@ aws --endpoint-url $ENDPOINT s3 cp --recursive "$LOCAL_DIR" "s3://$BUCKET_NAME/$
    ```bash
    ./scripts/upload-to-spaces.sh /tmp/hf-dataset/openwebtext your-bucket-name datasets/openwebtext
    ```
+
+
+## ⚙️ Provision CPU-Only Kubernetes Cluster for Tokenization
+
+First, create a Kubernetes cluster with a **CPU-optimized node pool** in the Atlanta region using `doctl`:
+
+```bash
+doctl kubernetes cluster create llm-training-cpu \
+  --region atl1 \
+  --count 3 \
+  --size c-8-intel \
+  --auto-upgrade=false
+```
+
+This will:
+- Create a new cluster named `llm-training-cpu`
+- Use 3× `c-8-intel` nodes (8 vCPU, 16GB RAM)
+- Deploy to the `atl1` region
+
+
+After creation, authenticate:
+
+```bash
+doctl kubernetes cluster kubeconfig save llm-training-cpu
+```
+
+### Manually Label Nodes for Tokenizer Workload
+
+To label the nodes for the tokenizer workload, first list your nodes and then apply the label:
+
+```bash
+kubectl get nodes
+kubectl label node <node-name> workload=tokenizer
+```
+
 
 ## 📁 Project Structure
 

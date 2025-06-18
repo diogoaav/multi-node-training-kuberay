@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tokenize-openwebtext
+spec:
+  parallelism: 3
+  completions: 3
+  template:
+    metadata:
+      labels:
+        job-name: tokenize-openwebtext
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        workload: tokenizer
+      containers:
+        - name: tokenizer
+          image: python:3.10-slim
+          command: ["bash", "-c"]
+          args:
+            - |
+              apt update && apt install -y git
+              pip install datasets transformers
+              git clone https://github.com/diogoaav/multi-node-training-kuberay /workspace
+              python /workspace/ray/tokenize_openwebtext.py
+          env:
+            - name: SHARD_COUNT
+              value: "3"
+            - name: SHARD_INDEX
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['batch.kubernetes.io/job-completion-index']
+          resources:
+            requests:
+              cpu: "4"
+              memory: "12Gi"
+            limits:
+              cpu: "4"
+              memory: "12Gi"
+          volumeMounts:
+            - name: juicefs
+              mountPath: /mnt/juicefs
+      volumes:
+        - name: juicefs
+          persistentVolumeClaim:
+            claimName: juicefs-pvc

@@ -1,0 +1,12 @@
+# manifests/k8s-juiceds-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: juicefs-dataset-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: juicefs-sc
